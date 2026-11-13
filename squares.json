@@ -1,0 +1,24 @@
+{
+  "_readme": "The 16 bingo squares, in grid order (row by row, 4 per row). ONE source: the phone page reads this file and the n8n export reads it when the workflow is rebuilt (python3 fate-bingo/build_workflow.py deploy). Edit the text freely; keep exactly 16 entries. 'short' shows on the tile, 'prompt' shows when a guest taps it. Square 1 is Josh's own example from the 2026-11-09 Content Sync.",
+  "squares": [
+    {"short": "Has a nonprofit client", "prompt": "Find someone who has a client that is a nonprofit."},
+    {"short": "Went fractional this year", "prompt": "Find someone who went fractional in the last 12 months."},
+    {"short": "Fractional for 5 years", "prompt": "Find someone who has run a fractional practice for 5 years or more."},
+    {"short": "Has 10 or more clients", "prompt": "Find someone who has 10 or more active clients right now."},
+
+    {"short": "Has a client on Ramp", "prompt": "Find someone who has at least one client running spend on Ramp."},
+    {"short": "Built a 13 week cash flow", "prompt": "Find someone who built a 13 week cash flow for a client this month."},
+    {"short": "Closed the books with AI", "prompt": "Find someone who used AI to help close the books this year."},
+    {"short": "Sat in a board meeting", "prompt": "Find someone who presented in a board meeting this quarter."},
+
+    {"short": "Started at a Big 4", "prompt": "Find someone who started their career at a Big 4 firm."},
+    {"short": "Has an online store client", "prompt": "Find someone who has an ecommerce client."},
+    {"short": "Raised prices this year", "prompt": "Find someone who raised their prices this year."},
+    {"short": "Hired this year", "prompt": "Find someone who hired someone onto their team this year."},
+
+    {"short": "Posts on LinkedIn weekly", "prompt": "Find someone who posts on LinkedIn every week."},
+    {"short": "Flew in for FATE", "prompt": "Find someone who travelled from outside the New York area for FATE."},
+    {"short": "Has a client abroad", "prompt": "Find someone who has a client based outside the US."},
+    {"short": "Favorite Excel shortcut", "prompt": "Find someone with a favorite Excel shortcut. Ask them to show you."}
+  ]
+}

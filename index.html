@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#242C33">
+<meta name="robots" content="noindex">
+<title>Dinner Bingo</title>
+<link rel="icon" href="josh.png">
+<link rel="preload" as="image" href="img/header-dark.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Shared SVG defs: the rough ink edge of the dauber stamp and the hand drawn bingo stroke. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="ink-rough" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="9" result="s"/>
+      <feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -10 7.6" result="holes"/>
+      <feComposite in="d" in2="holes" operator="in"/>
+    </filter>
+    <filter id="line-rough" filterUnits="userSpaceOnUse" x="-50" y="-50" width="2000" height="2000">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="2" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/></filter>
+    <radialGradient id="ball" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#FBFBF6"/><stop offset=".55" stop-color="#EAE9CB"/><stop offset="1" stop-color="#B4B39B"/>
+    </radialGradient>
+  </defs>
+</svg>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ======================= JOIN: your place card ======================= -->
+<main id="join" class="screen" hidden>
+  <figure class="hero" aria-hidden="true">
+    <img src="img/header-dark.jpg" alt="" class="hero-img" width="1400" height="933">
+    <span class="flame" style="--x:34.6%;--y:44.2%;--d:2.3s"></span>
+    <span class="flame" style="--x:39.5%;--y:41.8%;--d:1.9s"></span>
+    <span class="flame" style="--x:61.9%;--y:43.3%;--d:2.6s"></span>
+    <span class="flame" style="--x:66.1%;--y:45.7%;--d:2.1s"></span>
+    <span class="flame flame-lamp" style="--x:5.4%;--y:36%;--d:3.4s"></span>
+  </figure>
+
+  <div class="join-body">
+    <div class="titlerow">
+      <p class="eyebrow">FATE &middot; Fractional CFO Dinner</p>
+      <div class="balls" id="joinBalls" aria-hidden="true"></div>
+    </div>
+    <h1 class="title" id="joinTitle">Dinner Bingo</h1>
+    <p class="subtitle">New York &middot; Wednesday, Nov 18</p>
+
+    <ol class="rules">
+      <li><span class="seal">1</span><span>Find the person who fits each square and stamp their name on it.</span></li>
+      <li><span class="seal">2</span><span>1 point per square, plus 3 for every full row, column or diagonal.</span></li>
+      <li><span class="seal">3</span><span>One person can fill 2 of your squares at most.</span></li>
+      <li><span class="seal">4</span><span>Highest score when Josh calls time gets the mic.</span></li>
+    </ol>
+
+    <form id="joinForm" class="placecard" novalidate>
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <p class="placecard-label">Your place card</p>
+      <label class="field">
+        <span class="label">Your name</span>
+        <input id="fName" name="name" autocomplete="name" maxlength="60" required>
+      </label>
+      <label class="field">
+        <span class="label">Your firm <em>optional</em></span>
+        <input id="fFirm" name="firm" autocomplete="organization" maxlength="80">
+      </label>
+      <label class="field">
+        <span class="label">Email <em>optional, we send the event photos here</em></span>
+        <input id="fEmail" name="email" type="email" autocomplete="email" inputmode="email" maxlength="120">
+      </label>
+      <p id="joinError" class="error" role="alert" hidden></p>
+      <button class="btn btn-cream" type="submit">Get my bingo card</button>
+    </form>
+
+    <footer class="hosted"><img src="josh.png" alt="" width="28" height="29"> Hosted by Josh Aharonoff, Your CFO Guy, with Ramp</footer>
+  </div>
+</main>
+
+<!-- ======================= THE CARD ======================= -->
+<main id="card" class="screen" hidden>
+  <header class="band" aria-hidden="true">
+    <img src="img/header-dark.jpg" alt="" class="band-img" width="1400" height="933">
+  </header>
+
+  <div class="card-body">
+    <div class="who">
+      <p class="eyebrow">FATE &middot; Dinner Bingo</p>
+      <p id="meName" class="me-name"></p>
+      <button id="editMe" class="link" type="button">Edit my details</button>
+    </div>
+
+    <section class="scorebox" aria-live="polite">
+      <div class="rosette" id="rosette" aria-hidden="true"></div>
+      <p class="score"><span id="pts" class="score-num">0</span><span class="score-unit">points</span></p>
+      <div class="scoremeta">
+        <p id="scoreline" class="scoreline">0 of 16 squares</p>
+        <div class="rack" id="rack" aria-label="Bingos"></div>
+      </div>
+    </section>
+
+    <section class="frame" aria-label="Your bingo card">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="letters" aria-hidden="true"><span>F</span><span>A</span><span>T</span><span>E</span></div>
+      <div class="gridwrap">
+        <div id="grid" class="grid" role="group"></div>
+        <svg id="lines" class="lines" aria-hidden="true"></svg>
+      </div>
+    </section>
+
+    <p id="sync" class="sync" aria-live="polite"></p>
+
+    <section class="board-mini">
+      <h2 class="h2">Leaderboard</h2>
+      <ol id="miniBoard" class="lb lb-mini"></ol>
+    </section>
+
+    <footer class="hosted"><img src="josh.png" alt="" width="28" height="29"> Hosted by Josh Aharonoff, Your CFO Guy, with Ramp</footer>
+  </div>
+
+  <!-- the stamp sheet -->
+  <div id="scrim" class="scrim" hidden></div>
+  <section id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="edPrompt" hidden>
+    <div class="grabber" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <span id="edIcon" class="sheet-icon" aria-hidden="true"></span>
+      <div>
+        <p class="eyebrow" id="edNum"></p>
+        <p class="prompt" id="edPrompt"></p>
+      </div>
+    </div>
+    <form id="edForm" novalidate>
+      <label class="field">
+        <span class="label">Their name</span>
+        <input id="edName" autocomplete="off" autocapitalize="words" maxlength="60" enterkeyhint="done">
+      </label>
+      <div id="chips" class="chips" aria-label="People already playing"></div>
+      <p id="edError" class="error" role="alert" hidden></p>
+      <div class="row">
+        <button class="btn btn-cream" type="submit">Stamp it</button>
+        <button id="edClear" class="btn btn-ghost" type="button">Clear square</button>
+        <button id="edCancel" class="link" type="button">Close</button>
+      </div>
+    </form>
+  </section>
+
+  <div id="bingoBurst" class="burst" hidden aria-live="assertive">
+    <p class="burst-word" id="burstWord"></p>
+    <p class="burst-sub" id="burstSub"></p>
+  </div>
+</main>
+
+<!-- ======================= BIG SCREEN ======================= -->
+<main id="board" class="screen screen-board" hidden>
+  <section class="board-left">
+    <img src="img/header-dark.jpg" alt="" class="board-art" width="1400" height="933">
+    <span class="flame" style="--x:34.6%;--y:44.2%;--d:2.3s"></span>
+    <span class="flame" style="--x:39.5%;--y:41.8%;--d:1.9s"></span>
+    <span class="flame" style="--x:61.9%;--y:43.3%;--d:2.6s"></span>
+    <span class="flame" style="--x:66.1%;--y:45.7%;--d:2.1s"></span>
+    <div class="board-brand">
+      <p class="eyebrow">FATE &middot; Fractional CFO Dinner</p>
+      <h1 class="title title-xl" id="boardTitle">Dinner Bingo</h1>
+    </div>
+    <div class="board-scan">
+      <div class="qrframe">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div id="boardQr" class="qr"></div>
+      </div>
+      <div>
+        <p class="scan-cta">Scan to play</p>
+        <p id="boardUrl" class="url"></p>
+      </div>
+    </div>
+  </section>
+  <section class="board-right">
+    <div class="board-headrow"><h2 class="h2">Leaderboard</h2><p id="boardStamp" class="stamp-live"><span class="live-dot"></span><span id="stampText">Connecting</span></p></div>
+    <ol id="bigBoard" class="lb lb-big"></ol>
+    <p id="boardEmpty" class="empty" hidden>Waiting for the first card. Scan the code to be first on the board.</p>
+    <div id="feed" class="feed" aria-live="polite"></div>
+  </section>
+  <div id="boardBurst" class="burst burst-board" hidden>
+    <div class="balls balls-burst" id="burstBalls"></div>
+    <p class="burst-word">Bingo</p>
+    <p class="burst-sub" id="boardBurstName"></p>
+  </div>
+</main>
+
+<!-- ======================= ADMIN ======================= -->
+<main id="admin" class="screen screen-admin" hidden>
+  <p class="eyebrow">FATE &middot; Dinner Bingo</p>
+  <h1 class="title">All cards <span class="subtitle-inline">for Josh and Ramp</span></h1>
+  <form id="keyForm" class="form-inline" novalidate>
+    <label class="field"><span class="label">Admin key</span><input id="adminKey" autocomplete="off" spellcheck="false"></label>
+    <button class="btn btn-cream" type="submit">Load</button>
+  </form>
+  <p id="adminMsg" class="sync" role="status"></p>
+  <div class="row" id="adminActions" hidden><button id="csvBtn" class="btn btn-cream" type="button">Download CSV</button></div>
+  <div class="tablewrap"><table id="adminTable" class="data"></table></div>
+</main>
+
+<!-- ======================= PRINT ======================= -->
+<main id="print" class="screen screen-print" hidden>
+  <article class="tent">
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <img src="img/header-light.jpg" alt="" class="tent-art" width="1200" height="800">
+    <p class="eyebrow">FATE &middot; Fractional CFO Dinner</p>
+    <h1 class="title title-print">Dinner Bingo</h1>
+    <div class="qrframe qrframe-print"><div id="printQr" class="qr"></div></div>
+    <p class="tent-cta">Scan, type your name, then go meet the room.</p>
+    <ol class="rules rules-print">
+      <li><span class="seal">1</span><span>Find the person who fits each square and stamp their name on it.</span></li>
+      <li><span class="seal">2</span><span>1 point per square, plus 3 for every full row, column or diagonal.</span></li>
+      <li><span class="seal">3</span><span>Highest score when Josh calls time gets the mic.</span></li>
+    </ol>
+    <p id="printUrl" class="url"></p>
+    <footer class="hosted">Hosted by Josh Aharonoff, Your CFO Guy, with Ramp</footer>
+  </article>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
